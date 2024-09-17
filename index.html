@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article Writer</title>
+    <!-- Link to the external CSS file -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Article Writer</h1>
+    </header>
+    <div class="container">
+        <h2>Write a New Article</h2>
+        <form id="articleForm">
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" id="title" required>
+            </div>
+            <div class="form-group">
+                <label for="content">Content:</label>
+                <textarea id="content" rows="10" required></textarea>
+            </div>
+            <button type="submit">Save Article</button>
+        </form>
+        <h2>Saved Articles</h2>
+        <div id="articles"></div>
+    </div>
+
+    <script>
+        // Function to load articles from localStorage and display them
+        function loadArticles() {
+            const articles = JSON.parse(localStorage.getItem('articles')) || [];
+            const articlesDiv = document.getElementById('articles');
+            articlesDiv.innerHTML = ''; // Clear existing articles
+
+            articles.forEach((article, index) => {
+                const articleDiv = document.createElement('div');
+                articleDiv.classList.add('article');
+
+                const articleTitle = document.createElement('h3');
+                articleTitle.textContent = article.title;
+
+                const articleContent = document.createElement('p');
+                articleContent.textContent = article.content;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.classList.add('delete-btn');
+                deleteButton.addEventListener('click', () => {
+                    removeArticle(index);
+                });
+
+                articleDiv.appendChild(articleTitle);
+                articleDiv.appendChild(articleContent);
+                articleDiv.appendChild(deleteButton);
+
+                articlesDiv.appendChild(articleDiv);
+            });
+        }
+
+        // Function to save an article to localStorage
+        function saveArticle(title, content) {
+            const articles = JSON.parse(localStorage.getItem('articles')) || [];
+            articles.push({ title, content });
+            localStorage.setItem('articles', JSON.stringify(articles));
+        }
+
+        // Function to remove an article from localStorage
+        function removeArticle(index) {
+            const articles = JSON.parse(localStorage.getItem('articles')) || [];
+            articles.splice(index, 1);
+            localStorage.setItem('articles', JSON.stringify(articles));
+            loadArticles(); // Reload articles after deletion
+        }
+
+        // Event listener for form submission
+        document.getElementById('articleForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+
+            if (title && content) {
+                saveArticle(title, content);
+                loadArticles();
+
+                // Clear form fields
+                document.getElementById('title').value = '';
+                document.getElementById('content').value = '';
+            } else {
+                alert('Please fill out both fields.');
+            }
+        });
+
+        // Load articles on page load
+        loadArticles();
+    </script>
+</body>
+</html>
